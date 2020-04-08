@@ -38,31 +38,32 @@ install_asn1c_from_source(){
     OPTION="-y"
   fi
 
-  if [[ "$OS_DISTRO" == "ubuntu" ]]; then
-    PACKAGE_LIST="\
-      autoconf \
-      automake \
-      bison \
-      build-essential \
-      flex \
-      gcc \
-      libtool"
-  elif [[ "$OS_BASEDISTRO" == "fedora" ]]; then
-    PACKAGE_LIST="\
-      autoconf \
-      automake \
-      bison \
-      patch \
-      flex \
-      gcc \
-      libtool"
-  else
-    echo_fatal "$OS_DISTRO is not a supported distribution."
-  fi
-  $SUDO $INSTALLER install $OPTION $PACKAGE_LIST
-
   if [[ $prompt =~ [yY](es)* ]]
   then
+    if [[ "$OS_DISTRO" == "ubuntu" ]]; then
+      PACKAGE_LIST="\
+        autoconf \
+        automake \
+        bison \
+        build-essential \
+        flex \
+        gcc \
+        libtool"
+    elif [[ "$OS_BASEDISTRO" == "fedora" ]]; then
+      PACKAGE_LIST="\
+        autoconf \
+        automake \
+        bison \
+        patch \
+        flex \
+        gcc \
+        libtool"
+    else
+      echo_fatal "$OS_DISTRO is not a supported distribution."
+    fi
+    $SUDO $INSTALLER install $OPTION $PACKAGE_LIST
+
+
     $SUDO rm -rf /tmp/asn1c
     mkdir -p /tmp/asn1c
     GIT_SSL_NO_VERIFY=true git clone https://gitlab.eurecom.fr/oai/asn1c.git /tmp/asn1c

@@ -42,7 +42,7 @@ make_one_cert() {
 }
 
 #-------------------------------------------------------------------------------
-make_certs(){
+make_certs() {
 
   fqdn=$1
   certs_dir=$FREEDIAMETER_PREFIX/freeDiameter
@@ -78,7 +78,7 @@ remove_nettle_from_source() {
   nettle_uninstall_log=$OPENAIRCN_DIR/build/log/nettle_uninstall_log.txt
   #echo_info "\nUn-Installing Nettle from sources. The log file for nettle un-installation is here: $nettle_uninstall_log "
   (
-    $SUDO apt-get remove -y nettle-dev nettle-bin 
+    $SUDO apt-get remove -y nettle-dev nettle-bin
     cd /tmp
     echo "Downloading nettle archive"
     $SUDO rm -rf /tmp/nettle-2.5.tar.gz* /tmp/nettle-2.5
@@ -93,8 +93,8 @@ remove_nettle_from_source() {
     fi
     tar -xzf nettle-2.5.tar.gz
     cd nettle-2.5/
-    ./configure --disable-openssl --enable-shared --prefix=/usr 
-    $SUDO make uninstall || true 
+    ./configure --disable-openssl --enable-shared --prefix=/usr
+    $SUDO make uninstall || true
   ) >& $nettle_uninstall_log
   return 0
 }
@@ -102,12 +102,12 @@ remove_nettle_from_source() {
 
 #-------------------------------------------------------------------------------
 # Remove Gnutls from source (only done for Ubuntu distro)
-remove_gnutls_from_source(){
+remove_gnutls_from_source() {
   gnutls_uninstall_log=$OPENAIRCN_DIR/build/log/gnutls_uninstall_log.txt
   #echo_info "\nUn-Installing Gnutls. The log file for Gnutls un-installation is here: $gnutls_uninstall_log "
   (
     $SUDO apt-get remove -y libgnutls-dev
-    cd /tmp 
+    cd /tmp
     echo "Downloading gnutls archive"
     $SUDO rm -rf /tmp/gnutls-3.1.23.tar.xz* /tmp/gnutls-3.1.23
     wget http://mirrors.dotsrc.org/gcrypt/gnutls/v3.1/gnutls-3.1.23.tar.xz || \
@@ -354,6 +354,18 @@ install_opencoord.org_freediameter() {
     OPTION="-y"
   fi
 
+  specific_packages=""
+
+  if [ $OS_DISTRO == "ubuntu" ]  || [ $OS_DISTRO == "debian" ]; then
+    case "$(get_distribution_release)" in
+	"ubuntu14.04" | "ubuntu16.04" | "ubuntu17.04" | "ubuntu17.10" | "ubuntu18.04")
+	    specific_packages="libgcrypt-dev"
+	    ;;
+    "debian9")
+	    specific_packages="libgcrypt20-dev"
+	    ;;
+    esac
+  fi
   # libpq-dev 'may' be not needed
   $SUDO apt-get install $OPTION \
     autoconf  \
@@ -367,7 +379,6 @@ install_opencoord.org_freediameter() {
     g++ \
     gcc \
     gdb \
-    libgcrypt-dev \
     libidn11-dev \
     libmysqlclient-dev \
     libpq-dev \
@@ -377,7 +388,8 @@ install_opencoord.org_freediameter() {
     mercurial \
     python-dev \
     ssl-cert \
-    swig
+    swig \
+    $specific_packages
 
   if [[ $prompt =~ [yY](es)* ]]
   then
@@ -421,7 +433,7 @@ install_opencoord.org_freediameter() {
       echo_info "Detected freeDiameter $OPENAIRCN_DIR/build/patches/0001-opencoord.org.freeDiameter.patch alredy applied"
     fi
     ret=$?;[[ $ret -ne 0 ]] && return $ret
-  
+
     rm -rf build
     mkdir -p build
     cd build

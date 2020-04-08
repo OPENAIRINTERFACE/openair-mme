@@ -29,18 +29,14 @@ THIS_SCRIPT_PATH=`dirname $SCRIPT`
 source $THIS_SCRIPT_PATH/build_helper
 #-------------------------------------------------------------------------------
 install_liblfds7.1.0_from_source() {
-  if [ $1 -gt 0 ]; then
-    OPTION="-y"
-  else
-    OPTION=""
-  fi
-
-
   if [ $1 -eq 0 ]; then
+    OPTION=""
     read -p "Do you want to install liblfds7.1.0 ? <y/N> " prompt
   else
     prompt='y'
+    OPTION="-y"
   fi
+
   if [[ $prompt =~ [yY](es)* ]]
   then
     echo "Install liblfds7.1.0 from source"

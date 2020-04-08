@@ -47,7 +47,7 @@ check_install_mme_software() {
     echo_error "Your distribution $(get_distribution_release) is not supported by openair-cn"
     return 1
   fi
-  if [ $1 -gt 0 ]; then 
+  if [ $1 -gt 0 ]; then
     OPTION="-y"
   else
     OPTION=""
@@ -56,7 +56,7 @@ check_install_mme_software() {
   check_enable_epel_repos
 
   # Compilers, generators, ...
-  if [[ $OS_DISTRO == "ubuntu" ]]; then
+  if [ $OS_DISTRO == "ubuntu" ]  || [ $OS_DISTRO == "debian" ]; then
     PACKAGE_LIST="\
       autoconf \
       automake \
@@ -97,12 +97,12 @@ check_install_mme_software() {
   ret=$?;[[ $ret -ne 0 ]] && return $ret
 
   # Libraries
-  if [[ $OS_DISTRO == "ubuntu" ]]; then
+  if [ $OS_DISTRO == "ubuntu" ]  || [ $OS_DISTRO == "debian" ]; then
     case "$(get_distribution_release)" in
 	"ubuntu14.04" | "ubuntu16.04" | "ubuntu17.04" | "ubuntu17.10")
 	    specific_packages="libconfig8-dev"
 	    ;;
-	"ubuntu18.04")
+	"ubuntu18.04" | "debian9")
 	    specific_packages="libconfig-dev"
 	    ;;
     esac
@@ -179,12 +179,12 @@ check_install_mme_software() {
 
 
   # Networking
-  if [[ $OS_DISTRO == "ubuntu" ]]; then
+  if [ $OS_DISTRO == "ubuntu" ]  || [ $OS_DISTRO == "debian" ]; then
     case "$(get_distribution_release)" in
 	"ubuntu14.04" | "ubuntu16.04" | "ubuntu17.04" | "ubuntu17.10")
 	    specific_packages="iproute"
 	    ;;
-	"ubuntu18.04")
+	"ubuntu18.04" | "debian9")
 	    specific_packages="iproute2"
 	    ;;
     esac
@@ -205,7 +205,7 @@ check_install_mme_software() {
   $SUDO $INSTALLER install $OPTION $PACKAGE_LIST
   ret=$?;[[ $ret -ne 0 ]] && return $ret
 
-  if [[ "$OS_DISTRO" == "ubuntu" ]]; then
+  if [ $OS_DISTRO == "ubuntu" ]  || [ $OS_DISTRO == "debian" ]; then
     PACKAGE_LIST="\
       check \
       python-dev \

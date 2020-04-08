@@ -82,7 +82,7 @@ echo_info()    { cecho "$*" $blue         ;}
 
 #-------------------------------------------------------------------------------
 # From https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
-# arg1 is a dotted (or not) version number (ex 4.10.6.56-ubunutu) 
+# arg1 is a dotted (or not) version number (ex 4.10.6.56-ubunutu)
 # arg2 is a dotted (or not) version number (ex 4.10.6.56-ubunutu)
 # return 0 if $1 lower or equal $2, else 1
 version_le() {
@@ -133,6 +133,7 @@ check_supported_distribution() {
         "ubuntu14.04") return 0 ;;
         "rhel7")       return 0 ;;
         "centos7")     return 0 ;;
+        "debian9")     return 0 ;;
     esac
     return 1
 }
@@ -162,7 +163,7 @@ clean_kernel() {
 clean_all_files() {
   set_openair_env
   dir=$OPENAIRCN_DIR/build
-  rm -rf $dir/log 
+  rm -rf $dir/log
   rm -rf $dir/spgw/build $dir/spgw/CMakeLists.txt
   rm -rf $dir/mme/build $dir/mme/CMakeLists.txt
   rm -rf $dir/hss/build
@@ -181,8 +182,8 @@ disable_ipv6() {
 # arg2 = req_version
 #
 
-function version_gt() { 
-  test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; 
+function version_gt() {
+  test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
 }
 
 
@@ -911,7 +912,7 @@ set_virtual_interface_up(){
     return 1;
   fi
   case $interface in
-    *:*) 
+    *:*)
       $SUDO ifconfig  $interface $address up
       return $?
     ;;
@@ -925,11 +926,11 @@ set_virtual_interface_up(){
 set_cn_virtual_interfaces(){
   if [ "$#" -eq 1 ]; then
 
-    declare -a if_arr=("MME_INTERFACE_NAME_FOR_S1_MME" "MME_INTERFACE_NAME_FOR_S11" "MME_INTERFACE_NAME_FOR_S10" 
-                  "SGW_INTERFACE_NAME_FOR_S11" "SGW_INTERFACE_NAME_FOR_S1U_S12_S4_UP" "SGW_INTERFACE_NAME_FOR_S5_S8_UP" 
+    declare -a if_arr=("MME_INTERFACE_NAME_FOR_S1_MME" "MME_INTERFACE_NAME_FOR_S11" "MME_INTERFACE_NAME_FOR_S10"
+                  "SGW_INTERFACE_NAME_FOR_S11" "SGW_INTERFACE_NAME_FOR_S1U_S12_S4_UP" "SGW_INTERFACE_NAME_FOR_S5_S8_UP"
                   "PGW_INTERFACE_NAME_FOR_S5_S8" "PGW_INTERFACE_NAME_FOR_SGI")
-                  
-    declare -a ip_arr=("MME_IPV4_ADDRESS_FOR_S1_MME" "MME_IPV4_ADDRESS_FOR_S11" "MME_IPV4_ADDRESS_FOR_S10" 
+
+    declare -a ip_arr=("MME_IPV4_ADDRESS_FOR_S1_MME" "MME_IPV4_ADDRESS_FOR_S11" "MME_IPV4_ADDRESS_FOR_S10"
                   "SGW_IPV4_ADDRESS_FOR_S11" "SGW_IPV4_ADDRESS_FOR_S1U_S12_S4_UP" "SGW_IPV4_ADDRESS_FOR_S5_S8_UP"
                   "PGW_IPV4_ADDRESS_FOR_S5_S8" "PGW_IPV4_ADDRESS_FOR_SGI")
     for ((i=0; i<${#if_arr[@]}; ++i)); do
@@ -938,32 +939,32 @@ set_cn_virtual_interfaces(){
       unset $if_name
       unset $ip_address
     done
-  
+
     value="`cat $1 | cut -d "#" -f1 | cut -d "}" -f1 | cut -d "{" -f2 | grep 'ADDRESS\|INTERFACE' | tr -d " " | grep "="`"
     eval $value
 
-    declare -a if_arr=("MME_INTERFACE_NAME_FOR_S1_MME" "MME_INTERFACE_NAME_FOR_S11" "MME_INTERFACE_NAME_FOR_S10" 
-                  "SGW_INTERFACE_NAME_FOR_S11" "SGW_INTERFACE_NAME_FOR_S1U_S12_S4_UP" "SGW_INTERFACE_NAME_FOR_S5_S8_UP" 
+    declare -a if_arr=("MME_INTERFACE_NAME_FOR_S1_MME" "MME_INTERFACE_NAME_FOR_S11" "MME_INTERFACE_NAME_FOR_S10"
+                  "SGW_INTERFACE_NAME_FOR_S11" "SGW_INTERFACE_NAME_FOR_S1U_S12_S4_UP" "SGW_INTERFACE_NAME_FOR_S5_S8_UP"
                   "PGW_INTERFACE_NAME_FOR_S5_S8" "PGW_INTERFACE_NAME_FOR_SGI")
-                  
-    declare -a ip_arr=("MME_IPV4_ADDRESS_FOR_S1_MME" "MME_IPV4_ADDRESS_FOR_S11" "MME_IPV4_ADDRESS_FOR_S10" 
+
+    declare -a ip_arr=("MME_IPV4_ADDRESS_FOR_S1_MME" "MME_IPV4_ADDRESS_FOR_S11" "MME_IPV4_ADDRESS_FOR_S10"
                   "SGW_IPV4_ADDRESS_FOR_S11" "SGW_IPV4_ADDRESS_FOR_S1U_S12_S4_UP" "SGW_IPV4_ADDRESS_FOR_S5_S8_UP"
                   "PGW_IPV4_ADDRESS_FOR_S5_S8" "PGW_IPV4_ADDRESS_FOR_SGI")
 
     for ((i=0; i<${#if_arr[@]}; ++i)); do
       if_name=${if_arr[i]}
-      ip_address=${ip_arr[i]}      
+      ip_address=${ip_arr[i]}
       if [ -n "$${if_name}" ]; then
         case ${!if_name} in
-          *:*) 
+          *:*)
             if [ -n "$${ip_address}" ]; then
               echo_success "Configuring ${!if_name}  ${!ip_address}"
-              set_virtual_interface_up  ${!if_name}  ${!ip_address} 
+              set_virtual_interface_up  ${!if_name}  ${!ip_address}
               [[ $? -ne 0 ]] && return $?
             else
               echo_error "$ip_address does not exist in your config file $1, but $if_name does!"
               return 1
-            fi  
+            fi
             ;;
         esac
       fi
